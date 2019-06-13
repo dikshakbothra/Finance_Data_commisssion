@@ -1,0 +1,2487 @@
+---
+title: "Finance Commission Data Analysis"
+author: "RStudio"
+date: "31 May 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+> #Introduction
+
+As per 2011 census report, the Ranchi district has been divided into 18 blocks. The table shown below lists the 18 blocks of Ranchi district-
+
+```{r echo=TRUE, warning=FALSE , comment=NULL}
+library(knitr)
+block<-read.csv("blocks.csv",header = TRUE,sep="\t")
+block<-data.frame(block)
+kable(block[,1:2],caption="Blocks in Ranchi District" )
+
+```
+
+
+\newpage
+
+> #Data Analysis of Ranchi District from 2015-2019
+
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+options(scipen=999)     # for omitting exponential values in graph
+ranchi<-read_excel("ranchi_data.xlsx")
+#class(ranchi)
+category=c('Recieved','Spent','Recieved','Spent','Recieved',
+           'Spent','Recieved','Spent')
+year=c("2015-16","2015-16","2016-17","2016-17","2017-18"
+       ,"2017-18","2018-19","2018-19")
+Amount=c(as.integer(ranchi[327,4])/10000000,as.integer(ranchi[327,11])/10000000
+         ,as.integer(ranchi[327,5])/10000000,as.integer(ranchi[327,12])/10000000,
+         as.integer(ranchi[327,6])/10000000+as.integer(ranchi[327,7])/10000000,
+         as.integer(ranchi[327,13])/10000000,as.integer(ranchi[327,9])/10000000,
+         as.integer(ranchi[327,14])/10000000)
+Finance=data.frame(category,year,Amount)
+library(ggplot2)
+
+
+ggplot(Finance, aes((year), Amount, fill = category)) + 
+  geom_bar(stat="identity", position = "dodge") + 
+  scale_fill_brewer(palette = "Set1") + ggtitle("Amount Received and Spent on yearly basis from 2015-19") + labs(y="Amount (in Crores)")
+
+```
+
+From the finance data of amount given and spent by the Ranchi district, it can be clearly seen that all the 18 blocks cumulatively had used `r paste0(round(as.numeric(ranchi[327,17]),digits=2),"%")` of the total amount received which is `r paste("Rs",round(as.numeric(ranchi[327,10])/10000000,digits=2),"Crore")`.
+By spending `r paste("Rs",round(as.numeric(ranchi[327,15])/10000000,digits=2),"Crore")` from the total amount received over these years the district finance commission is left with `r paste("Rs",round(as.numeric(ranchi[327,16])/10000000,digits=2),"Crore")` as of May 1, 2019 without including the amount received and spent in the current Year(2019).
+
+From the graph it can be observed that 2015-16 has the minimum percentage use of amount received whereas 2018-19 is the only year where expenditure was more than the amount received.
+
+```{r echo=TRUE, message=FALSE, error=FALSE, warning=FALSE}
+#Amount Recieved and Spent by each Block from 2015-19
+library(readxl)
+block<-read_excel("blocks.xlsx")
+ranchi<-read_excel("ranchi_data.xlsx")
+na_vec=which(!complete.cases(ranchi))
+ranchi_clean=ranchi[na_vec,]
+x=unique(ranchi_clean$Block)
+x=x[3:20]
+x[3]="CHANHO"
+b=c(x,x)
+b_rs=c(as.numeric(unlist(c(block[10])))/10000000,
+       as.numeric(unlist(c(block[15])))/10000000)
+category=c(rep('Received',18),rep("Spent",18))
+
+b_data=data.frame(category,b,b_rs)
+library(ggplot2)
+
+ggplot(b_data, aes(b, b_rs , fill = category)) + 
+  geom_bar(stat="identity", position = "dodge") + 
+  scale_fill_brewer(palette = "Set1") + labs(y="Amount (in Crores)",
+                                             x="") +
+  theme(axis.text.x=element_text(angle=90, hjust=1)) +
+  ggtitle("Amount Recieved and Spent by each Block from 2015-19")
+
+
+```
+
+```{r echo=TRUE, message=FALSE, error=FALSE, warning=FALSE}
+#install.packages
+library(plotrix)
+a_received=c(as.integer(ranchi[327,4])/10000,as.integer(ranchi[327,5])/10000,(as.integer(ranchi[327,6])+as.integer(ranchi[327,7]))/10000,as.integer(ranchi[327,9])/10000)
+pie3D(a_received,labels=unique(year),
+    col=rainbow(4),main = "Yearwise Contribution to the total amount")
+
+```
+
+From the above pie chart it could be clearly seen that the maximum contribution to the total amount of `r paste("Rs",round(as.numeric(ranchi[327,10])/10000000,digits=2),"Crore")` was from the year 2016-17.
+
+
+\newpage
+
+## Data Analysis of Khelari Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("KHELARI.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Khelari Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+ 
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+par(mfrow=c(1,2))
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Burmu Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("BURMU.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,30+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Burmu Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Chanho Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("CHANHO.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Chanho Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Mandar Block
+
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+
+library(readxl)
+block=read_excel("MANDAR.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,30+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Mandar Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+\newpage
+
+##Data Analysis of Bedo Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("BERO.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Bedo Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+  
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+ 
+
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Lapung Block
+
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("LAPUNG.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Lapung Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+\newpage
+
+##Data Analysis of Itki Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+library(readxl)
+block=read_excel("ITKI.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Itki Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Nagri Block
+
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("NAGRI.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Nagri Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+\newpage
+
+##Data Analysis of Ratu Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("RATU.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Ratu Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Kanke Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("KANKE.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Kanke Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.4,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.4,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.4, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.4,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Ormanjhi Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("ORMANJHI.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Ormanjhi Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Angara Block
+
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("ANGARA.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Angara Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Namkum Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("NAMKUM.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Namkum Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+
+\newpage
+
+##Data Analysis of Bundu Block
+
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("BUNDU.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Bundu Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+ 
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Rahe Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("RAHE.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Rahe Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+ 
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+ 
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+
+
+\newpage
+
+##Data Analysis of Silli Block
+
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("SILLI.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Silli Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+ 
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+ 
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+
+\newpage
+
+##Data Analysis of Sonahatu Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("SONAHATU.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Sonhatu Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+ 
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+ 
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+
+
+
+\newpage
+
+##Data Analysis of Tamar Block
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+library(readxl)
+block=read_excel("TAMAR.xlsx")
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[15])))/100000
+receive=as.numeric(unlist(c(block[10])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("red","blue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of Tamar Block (2015-19)', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
+
+### Yearwise Plots
+
+```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[11])))/100000
+receive=as.numeric(unlist(c(block[4])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("orange","green")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2015-2016', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+ 
+
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[12])))/100000
+receive=as.numeric(unlist(c(block[5])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("pink","aliceblue")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2016-2017', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+par(mfrow=c(1,2))
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[13])))/100000
+receive=(as.numeric(unlist(c(block[7])))+as.numeric(unlist(c(block[6]))))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("coral","cyan3")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,10+(max(c(receive,spent)))),
+  col=cols,
+  main ='Analysis of year 2017-2018', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6, #xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+ 
+pnchyt=c((block[3]))
+spent=as.numeric(unlist(c(block[14])))/100000
+receive=as.numeric(unlist(c(block[9])))/100000
+b_p=data.frame(pnchyt,round(receive,digits = 2)
+               ,round(spent,digits = 2))
+names(b_p)=c('pnchayat','receive','spent')
+cols=c("darkolivegreen1","darkorchid1")
+barplot(
+  t(b_p[c('receive','spent')]),
+  beside=T,
+  ylim = c(0,20+max(c(receive,spent))),
+  col=cols,
+  main ='Analysis of year 2018-2019', 
+  names.arg=b_p$pnchayat,
+  las=2, cex.names = 0.6,# xaxt='n',
+  ylab='Amount (in Lakhs)',
+  legend.text=c('Received','Spent')
+)
+box()
+#axis(side=1, at=seq(1,length(spent)), labels=b_p$pnchayat, cex.axis=1)
+#text(cex=1, x=x-.25, y=-1.25, b_p$pnchayat, xpd=TRUE, srt=45)
+
+```
+
