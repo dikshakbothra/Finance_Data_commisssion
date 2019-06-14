@@ -64,8 +64,8 @@ ranchi<-read_excel("ranchi_data.xlsx")
 na_vec=which(!complete.cases(ranchi))
 ranchi_clean=ranchi[na_vec,]
 x=unique(ranchi_clean$Block)
+x=x[!x %in% x[6]]
 x=x[3:20]
-x[3]="CHANHO"
 b=c(x,x)
 b_rs=c(as.numeric(unlist(c(block[10])))/10000000,
        as.numeric(unlist(c(block[15])))/10000000)
