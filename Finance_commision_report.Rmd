@@ -30,7 +30,7 @@ Ranchi District has 1311 revenue villages under 305 panchayats. As per 2011 cens
 library(knitr)
 block<-read.csv("blocks.csv",header = TRUE)
 block<-data.frame(block)
-kable(block[,c(1:2,4)],caption="Blocks in Ranchi District" )
+kable(block[,c(1:2,4:6)],caption="Blocks in Ranchi District" )
 ```
 
 # Fourteen Finance Commission fund status: 
@@ -75,7 +75,7 @@ Here, we present the distribution of funds received in the four financial years.
 #install.packages
 library(plotrix)
 a_received=c(as.integer(ranchi[327,4])/10000,as.integer(ranchi[327,5])/10000,(as.integer(ranchi[327,6])+as.integer(ranchi[327,7]))/10000,as.integer(ranchi[327,9])/10000)
-pie3D(a_received,labels=unique(year),
+pie(a_received,labels=unique(year),
     col=rainbow(4),main = "Yearwise Contribution to the total amount")
 
 ```
@@ -136,7 +136,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds in Khelari Block (2015-19)', 
+  main ='Distribution of funds in Khelari Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -154,10 +154,10 @@ From this graph, we can conclude the following:
 * All of the panchayats in **Khelari** block have spent the maximum amount of funds received. It is interesting to note that **Churi(South)** panchayat has spent all of the received amount. 
 
 
-## Year wise expenditure status of Khelari block
+##  status of Khelari block
 Here, we present the analysis of funds spent by each panchayat in **Khelari** block. As stated earlier, we have four different financial years in the span of 2015-19.  
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -272,7 +272,7 @@ barplot(
   beside=T,
   ylim = c(0,30+max(c(receive,spent))),
   col=cols,
-  main ='Fund distribution of Burmu Block (2015-19)', 
+  main ='Fund distribution of Burmu Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -290,10 +290,10 @@ From the graph, we can conclude the following:
 * **Gurganyi** block has spent only 60% of the amount received i.e. Rs. 0.88 crore.
 
 
-## Year wise expenditure status of Burmu block 
+##  status of Burmu block 
 Here, we present the analysis of funds spent by each panchayat in **Burmu** block. As stated earlier, we have four different financial years in the span of 2015-19. 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -408,7 +408,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Chanho Block (2015-19)', 
+  main ='Distribution of funds of Chanho Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -427,10 +427,10 @@ From the graph, we can conclude the following:
 * **Chama** panchayat has received maximum funds i.e. 1.00 Crore, whereas **Panderi** Panchayat has received minimum funds i.e. 0.57 Crore. 
 * **PatRatu** panchayat has spent 100% of the amount received. 
 
-## Year wise expenditure status of Chanho block 
+##  status of Chanho block 
 Here, we present the analysis of funds spent by each panchayat in **Chanho** block. As stated earlier, we have four different financial years in the span of 2015-19. 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -545,7 +545,7 @@ barplot(
   beside=T,
   ylim = c(0,30+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Mandar Block (2015-19)', 
+  main ='Distribution of funds of Mandar Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -562,9 +562,11 @@ From the graph, we can conclude the following:
 * **Mandar** block has received Rs. 15.18 crores. 
 * All the panchayats in this block have received approximately Rs. 0.80 Crore and they have spent almost 91% of the received money in last four years. 
 
-## Year wise expenditure status of Mandar block 
-Here, we present the analysis of funds spent by each panchayat in **Mandar** block. As stated earlier, we have four different financial years in the span of 2015-19. 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+##  status of Mandar block 
+Here, we present the analysis of funds spent by each panchayat in **Mandar** block. As stated earlier, we have four different financial years in the span of 2015-19.
+
+
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -683,7 +685,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Bedo Block (2015-19)', 
+  main ='Distribution of funds of Bedo Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -697,9 +699,9 @@ box()
 
 The Bero block has received 13.75 Crores. They have spent Rs. 12.94 Crores. From below graph you can see that all the panchayats have utilized more than 80% of the funds. In Bero block, more than 6 panchayats utilized 100% of the funds received. 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -821,7 +823,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Lapung Block (2015-19)', 
+  main ='Distribution of funds of Lapung Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -835,9 +837,9 @@ box()
 
 The Lapung block has received Rs. 8.25 Crore for four years.  They are remaining with Rs. 1.58 crore i.e. approximately 20% of the received amount. Compare to all the panchayats, Kakaria has not utilized 50% of the fund received. 
 
-### Yearwise exoenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -955,7 +957,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Itki Block (2015-19)', 
+  main ='Distribution of funds of Itki Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -969,9 +971,9 @@ box()
 
 Compare to all other block Itki block has received minimum amount i.e.  Rs. 5.86 Crore. But they have utilized this amount efficiently. On an average, each panchayat has received Rs. 0.65 Crore for four years. Out of nine four panchayats have utilized 100% funds received. 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1089,7 +1091,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Nagri Block (2015-19)', 
+  main ='Distribution of funds of Nagri Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1103,9 +1105,9 @@ box()
 
 The Nagri block has spent Rs. 7.45 Crore out of Rs. 9.00 Crores received for four years. Panchayat Naro has utilized minimum percentage of use of fund i.e. 72%. 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1222,7 +1224,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Ratu Block (2015-19)', 
+  main ='Distribution of funds of Ratu Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1236,9 +1238,9 @@ box()
 
 Ratu block has managed to utilized Rs. 11.00 Crore out of Rs .13.37 Crore. The panchayat Futkaltoli and Kamre have received maximum funds i.e. Rs. 1.00 Crore each. But Kamre panchayat could not spend more 40% in four years. If you check year wise plot for Kamre panchayat ,you will notice that they have not spent funds in FY 2018-19.
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1357,7 +1359,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Kanke Block (2015-19)', 
+  main ='Distribution of funds of Kanke Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1371,9 +1373,9 @@ box()
 
 The population of the block is 244,072 (as of the 2011 census),  spread across 103 villages and two towns: Kanke and Arsande. It has 32 panchayats, i.e.  maximum number of panchayats in it. 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1491,7 +1493,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Ormanjhi Block (2015-19)', 
+  main ='Distribution of funds of Ormanjhi Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1507,9 +1509,9 @@ This block had received Rs. 11.59 Crores. By end of FY 2018-19, they have left w
 
 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1627,7 +1629,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Angara Block (2015-19)', 
+  main ='Distribution of funds of Angara Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1641,9 +1643,9 @@ box()
 
 Anagara block has spent Rs. 11.76 Crores by end of four years. They have left with Rs. 2. 42 Crore. On an average, all the panchayats have received Rs. 0.65 Crore for four years.
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1762,7 +1764,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Namkum Block (2015-19)', 
+  main ='Distribution of funds of Namkum Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1776,9 +1778,9 @@ box()
 
 Namkum block has received Rs. 17.96 Crores for the period 2015- 2019. This block has spent least percentage of fund received i.e. 69%. 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1898,7 +1900,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Bundu Block (2015-19)', 
+  main ='Distribution of funds of Bundu Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1912,9 +1914,9 @@ box()
 
 Bundu block has received funds Rs. 7.80 Crores. By end of FY 2018-19, they have unspent amount Rs. 1.17 Crore. The Churgi panchayat has received minimum amount compare to other panchayats.
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE, include=FALSE  , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -2032,7 +2034,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Rahe Block (2015-19)', 
+  main ='Distribution of funds of Rahe Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -2048,9 +2050,9 @@ Rahe has received Rs. 6.71 Croes for four years. They have spent 88 % of amount 
 
 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -2170,7 +2172,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Silli Block (2015-19)', 
+  main ='Distribution of funds of Silli Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -2184,9 +2186,9 @@ box()
 
 The Silli block has received Rs. 13.79 Crores. They have managed to spent 92% of funds received. The average funds received is Rs. 0.70 Crore for each Panchayat. 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -2304,7 +2306,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Distribution of funds of Sonhatu Block (2015-19)', 
+  main ='Distribution of funds of Sonhatu Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -2318,9 +2320,9 @@ box()
 
 This block has received Rs. 9.77 Crores. By end of four years , expenditure is Rs. 8.89 Crores. The panchayat Jilingsereng has received only Rs. 0.27 Crore. After the expenditure ,they are left with only Rs. 8671.
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -2421,6 +2423,10 @@ box()
 
 \newpage
 
+
+
+
+
 ##Fund Status of Tamar Block
 
 There are 23 panchayats in Tamar block
@@ -2440,7 +2446,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Tamar Block (2015-19)', 
+  main ='Distribution of Funds of Tamar Block (2015-19)',cex.main=0.8,font.main = 1, 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -2454,9 +2460,9 @@ box()
 
 The Tamar block has received Rs. 16.85 Crores. The expenditure for four is Rs. 14.04. The average funds received for all the panchayats is Rs. 0.73 Crore. The expenditure by Malhan (Bhuiyandih) Panchayat is only 35% of the total amount received. 
 
-### Yearwise expenditure
+ 
 
-```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , include=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
