@@ -30,6 +30,8 @@ Ranchi District has 1311 revenue villages under 305 panchayats. As per 2011 cens
 library(knitr)
 block<-read.csv("blocks.csv",header = TRUE)
 block<-data.frame(block)
+block$Received_in_Crores=round(block$Received_in_Crores/10000000,digits=2)
+block$Spent_in_Crores=round(block$Spent_in_Crores/10000000,digits=2)
 kable(block[,c(1:2,4:6)],caption="Blocks in Ranchi District" )
 ```
 
