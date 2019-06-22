@@ -1,7 +1,7 @@
 ---
-title: "Finance Commission Data Analysis"
-author: "RStudio"
-date: "31 May 2019"
+title: "| Report on Fourteenth Finance Commission of \n| Ranchi District\n"
+author: "FOSSEE, IIT Bombay"
+date: "21 June 2019"
 output: pdf_document
 ---
 
@@ -9,31 +9,43 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-> #Introduction
-
-As per 2011 census report, the Ranchi district has been divided into 18 blocks. The table shown below lists the 18 blocks of Ranchi district-
-
-```{r echo=TRUE, warning=FALSE , comment=NULL}
-library(knitr)
-block<-read.csv("blocks.csv",header = TRUE,sep="\t")
-block<-data.frame(block)
-kable(block[,1:2],caption="Blocks in Ranchi District" )
-
-```
-
-
 \newpage
 
-> #Data Analysis of Ranchi District from 2015-2019
+\tableofcontents
 
+\newpage 
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+# Introduction
+The Fourteen Finance Commission (FFC) was constituted by President on 2 January 2013 to give recommendation on specific aspect of Centre- State fiscal relations during 2015-2020. FFC was, inter-alia mandated recommended measures needed to augment consolidated funds of the states to supplement the resources of the Panchayats based on recommendation of State Finance Commission (SFC).
+
+The funds will be transferred to local bodies for providing basic services including water supply, sanitation including septic management, sewage, solid waste management, maintenance of community assets, maintenance of roads, footpaths, street-lighting and any other basic services within the functions assign to them under relevant legislations. 
+
+## Ranchi District
+The administrative territory of Ranchi is divided into Ranchi and Bundu subdivisions and each subdivision is further divided into blocks, panchayats and villages. The district consists of 18 blocks and 305 panchayats. Under the Ranchi Subdivision, there are 14 blocks and the Bundu Subdivision consists of 4 blocks. With a geographical area of 5,097 square kms, Ranchi district is one of the largest districts in Jharkhand.
+
+## Village and Panchayats
+Ranchi District has 1311 revenue villages under 305 panchayats. As per 2011 census report, the Ranchi district has been divided into 18 blocks. The table shown below lists the 18 blocks of Ranchi district along with the number of panchayat in each block. 
+
+```{r echo=FALSE, warning=FALSE , comment=NULL}
+library(knitr)
+block<-read.csv("blocks.csv",header = TRUE)
+block<-data.frame(block)
+kable(block[,c(1:2,4)],caption="Blocks in Ranchi District" )
+```
+
+# Fourteen Finance Commission fund status: 
+The FFC has released basic grant of Rs. 2,216,298,916 (221.63 crores approximately) for the period 2015-19 among 18 blocks. 
+
+# Analysis of funds for Ranchi District (2015-2019)
+Here, we present the year wise distribution of funds in four different financial years.  
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 options(scipen=999)     # for omitting exponential values in graph
 ranchi<-read_excel("ranchi_data.xlsx")
 #class(ranchi)
-category=c('Recieved','Spent','Recieved','Spent','Recieved',
-           'Spent','Recieved','Spent')
+category=c('Received','Spent','Received','Spent','Received',
+           'Spent','Received','Spent')
 year=c("2015-16","2015-16","2016-17","2016-17","2017-18"
        ,"2017-18","2018-19","2018-19")
 Amount=c(as.integer(ranchi[327,4])/10000000,as.integer(ranchi[327,11])/10000000
@@ -43,20 +55,38 @@ Amount=c(as.integer(ranchi[327,4])/10000000,as.integer(ranchi[327,11])/10000000
          as.integer(ranchi[327,14])/10000000)
 Finance=data.frame(category,year,Amount)
 library(ggplot2)
-
-
 ggplot(Finance, aes((year), Amount, fill = category)) + 
   geom_bar(stat="identity", position = "dodge") + 
   scale_fill_brewer(palette = "Set1") + ggtitle("Amount Received and Spent on yearly basis from 2015-19") + labs(y="Amount (in Crores)")
+```
+
+From the above graph, we can conclude the following: 
+
+* All the 18 blocks cumulatively had spent `r paste0(round(as.numeric(ranchi[327,17]),digits=2),"%")` of the total amount received which is `r paste("Rs",round(as.numeric(ranchi[327,10])/10000000,digits=2),"Crore")`.
+
+* By spending `r paste("Rs",round(as.numeric(ranchi[327,15])/10000000,digits=2),"Crore")`, from the total amount received over these years the district finance commission is left with `r paste("Rs",round(as.numeric(ranchi[327,16])/10000000,digits=2),"Crore")` as on 1 May 2019. This excludes the amount received and spent in the current year (2019).
+
+* 2015-16 has the minimum percentage spent of amount received, whereas 2018-19 is the only year where expenditure was more than the amount received.
+
+## Year wise distribution of funds 
+Here, we present the distribution of funds received in the four financial years.
+
+```{r echo=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+#install.packages
+library(plotrix)
+a_received=c(as.integer(ranchi[327,4])/10000,as.integer(ranchi[327,5])/10000,(as.integer(ranchi[327,6])+as.integer(ranchi[327,7]))/10000,as.integer(ranchi[327,9])/10000)
+pie3D(a_received,labels=unique(year),
+    col=rainbow(4),main = "Yearwise Contribution to the total amount")
 
 ```
 
-From the finance data of amount given and spent by the Ranchi district, it can be clearly seen that all the 18 blocks cumulatively had used `r paste0(round(as.numeric(ranchi[327,17]),digits=2),"%")` of the total amount received which is `r paste("Rs",round(as.numeric(ranchi[327,10])/10000000,digits=2),"Crore")`.
-By spending `r paste("Rs",round(as.numeric(ranchi[327,15])/10000000,digits=2),"Crore")` from the total amount received over these years the district finance commission is left with `r paste("Rs",round(as.numeric(ranchi[327,16])/10000000,digits=2),"Crore")` as of May 1, 2019 without including the amount received and spent in the current Year(2019).
+From the above pie chart, it could be clearly seen that the maximum contribution to the total amount of `r paste("Rs",round(as.numeric(ranchi[327,10])/10000000,digits=2),"Crore")` was from the year 2016-17.
 
-From the graph it can be observed that 2015-16 has the minimum percentage use of amount received whereas 2018-19 is the only year where expenditure was more than the amount received.
 
-```{r echo=TRUE, message=FALSE, error=FALSE, warning=FALSE}
+# Analysis of funds for each block
+Here, we present the amount received and spent by each block in Ranchi district. 
+
+```{r echo=FALSE, message=FALSE, error=FALSE, warning=FALSE}
 #Amount Recieved and Spent by each Block from 2015-19
 library(readxl)
 block<-read_excel("blocks.xlsx")
@@ -79,31 +109,22 @@ ggplot(b_data, aes(b, b_rs , fill = category)) +
   scale_fill_brewer(palette = "Set1") + labs(y="Amount (in Crores)",
                                              x="") +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  ggtitle("Amount Recieved and Spent by each Block from 2015-19")
-
-
+  ggtitle("Amount received and spent by each block from 2015-19")
 ```
 
-```{r echo=TRUE, message=FALSE, error=FALSE, warning=FALSE}
-#install.packages
-library(plotrix)
-a_received=c(as.integer(ranchi[327,4])/10000,as.integer(ranchi[327,5])/10000,(as.integer(ranchi[327,6])+as.integer(ranchi[327,7]))/10000,as.integer(ranchi[327,9])/10000)
-pie3D(a_received,labels=unique(year),
-    col=rainbow(4),main = "Yearwise Contribution to the total amount")
+From the above graph, we can conclude the following:
 
-```
+* The block named **Itki** has received minimum funds i.e.  Rs. 5.86 crores, whereas block named **Kanke** has received Rs. 24.06 crores. On an average all the blocks have received Rs. 13 crores for four years.
+* Due to circular no. 45 dated 25/1/2018, the maximum contribution to the total amount of Rs 221.63 crores was from the year 2017-18. 
 
-From the above pie chart it could be clearly seen that the maximum contribution to the total amount of `r paste("Rs",round(as.numeric(ranchi[327,10])/10000000,digits=2),"Crore")` was from the year 2016-17.
+## Analysis of funds for Khelari block
+Khelari is an area rich in coal. Some of the important coal mines of Central Coalfields Limited (CCL) is in Khelari. As of 2001 India census, Khelari had a population of 19 thousand approximately (18,699). Males constitute 53% of the population and females 47%. Khelari has an average literacy rate of 59%, lower than the national average of 59.5%. Out of this, male literacy is 69%, and female literacy is 49%. In Khelari, 14% of the population is under 6 years of age. In this section, we present the analysis of funds for the 14 panchayats in Khelari block.  
 
-
-\newpage
-
-## Data Analysis of Khelari Block
-
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("KHELARI.xlsx")
 pnchyt=c((block[3]))
+#kable(pnchyt[,1:2],caption="Panchayats in Khelari Block" )
 spent=as.numeric(unlist(c(block[15])))/100000
 receive=as.numeric(unlist(c(block[10])))/100000
 b_p=data.frame(pnchyt,round(receive,digits = 2)
@@ -115,7 +136,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Khelari Block (2015-19)', 
+  main ='Distribution of funds in Khelari Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -127,10 +148,16 @@ box()
 
 ```
 
+From this graph, we can conclude the following:
 
-### Yearwise Plots
+* **Lapra** panchayat receive the highest amount of funds, whereas **Bamne** panchayat the least. 
+* All of the panchayats in **Khelari** block have spent the maximum amount of funds received. It is interesting to note that **Churi(South)** panchayat has spent all of the received amount. 
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+## Year wise expenditure status of Khelari block
+Here, we present the analysis of funds spent by each panchayat in **Khelari** block. As stated earlier, we have four different financial years in the span of 2015-19.  
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -227,14 +254,10 @@ box()
 ```
 
 
+## Analysis of funds for Burmu Block
+Burmu block is a community development block of Ranchi district in the Indian state of Jharkhand. Burmu consist of 283 villages and 23 Panchayats. This place is in the border of Ranchi district and Ramgarh district. In this section, we present the analysis of funds for the 14 panchayats in Burmu block.  
 
-
-
-\newpage
-
-##Data Analysis of Burmu Block
-
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("BURMU.xlsx")
 pnchyt=c((block[3]))
@@ -249,7 +272,7 @@ barplot(
   beside=T,
   ylim = c(0,30+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Burmu Block (2015-19)', 
+  main ='Fund distribution of Burmu Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -261,10 +284,16 @@ box()
 
 ```
 
+From the graph, we can conclude the following:
 
-### Yearwise Plots
+* **Burma** block has received Rs. 11.27 crores for four years. They have Rs. 1.89 Crores remaining with them by end of 2019. 
+* **Gurganyi** block has spent only 60% of the amount received i.e. Rs. 0.88 crore.
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+## Year wise expenditure status of Burmu block 
+Here, we present the analysis of funds spent by each panchayat in **Burmu** block. As stated earlier, we have four different financial years in the span of 2015-19. 
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -361,15 +390,10 @@ box()
 
 ```
 
+## Analysis of funds for Chanho Block
+Chanho block is a community development block of Ranchi district. There are 67 villages in the block, with a total population of 1 lakh approximately (107,503) as of the 2011 census. It is located 45 km towards west from Ranchi. In this section, we present the analysis of funds for the 17 panchayats in Burmu block.  
 
-
-
-
-\newpage
-
-##Data Analysis of Chanho Block
-
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("CHANHO.xlsx")
 pnchyt=c((block[3]))
@@ -384,7 +408,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Chanho Block (2015-19)', 
+  main ='Distribution of funds of Chanho Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -396,10 +420,17 @@ box()
 
 ```
 
+From the graph, we can conclude the following:
 
-### Yearwise Plots
+* **Chanho**  block  has received Rs. 13.01 Crore for the four years. They have spent Rs. 10.86 Crore. 
+* **Choraya** panchayat has received Rs. 0.75 Crore and they have spent only 45% of funds. 
+* **Chama** panchayat has received maximum funds i.e. 1.00 Crore, whereas **Panderi** Panchayat has received minimum funds i.e. 0.57 Crore. 
+* **PatRatu** panchayat has spent 100% of the amount received. 
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+## Year wise expenditure status of Chanho block 
+Here, we present the analysis of funds spent by each panchayat in **Chanho** block. As stated earlier, we have four different financial years in the span of 2015-19. 
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -496,18 +527,10 @@ box()
 
 ```
 
+## Analysis of funds for Mandar Block
+Mandar is a community development block of Ranchi district. The block consists of 69 villages with a total population of 1.2 lakhs approximately (128,585) as of 2011 consensus. In this section, we present the analysis of funds for the 19 panchayats in Mandar block. 
 
-
-
-
-\newpage
-
-##Data Analysis of Mandar Block
-
-
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
-
-
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("MANDAR.xlsx")
 pnchyt=c((block[3]))
@@ -522,7 +545,7 @@ barplot(
   beside=T,
   ylim = c(0,30+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Mandar Block (2015-19)', 
+  main ='Distribution of funds of Mandar Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -534,10 +557,14 @@ box()
 
 ```
 
+From the graph, we can conclude the following:
 
-### Yearwise Plots
+* **Mandar** block has received Rs. 15.18 crores. 
+* All the panchayats in this block have received approximately Rs. 0.80 Crore and they have spent almost 91% of the received money in last four years. 
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+## Year wise expenditure status of Mandar block 
+Here, we present the analysis of funds spent by each panchayat in **Mandar** block. As stated earlier, we have four different financial years in the span of 2015-19. 
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -635,13 +662,13 @@ box()
 ```
 
 
+##Fund Status of Bedo Block
+
+Bero is famous for growing horticulture crops in huge quantity and it is the main area of Jharkhand which provides higher amount of vegetables all-round the years. Huge quantity of vegetables is exported to other state like west Bengal, Odisa, Delhi, Banglore, Mumbai etc. In over the india bero is the only place where potato is grown during rainy season. 
+There are 17 panchayats in Bero.
 
 
-\newpage
-
-##Data Analysis of Bedo Block
-
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("BERO.xlsx")
 pnchyt=c((block[3]))
@@ -656,7 +683,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Bedo Block (2015-19)', 
+  main ='Distribution of funds of Bedo Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -668,10 +695,11 @@ box()
 
 ```
 
+The Bero block has received 13.75 Crores. They have spent Rs. 12.94 Crores. From below graph you can see that all the panchayats have utilized more than 80% of the funds. In Bero block, more than 6 panchayats utilized 100% of the funds received. 
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
@@ -774,10 +802,11 @@ box()
 
 \newpage
 
-##Data Analysis of Lapung Block
+##Fund status of Lapung Block
 
+Lapung is a community development block of Ranchi district. The block contains 78 villages with a total population of 63,053 (as of 2011).  It is in the 696 m elevation(altitude). This Place is in the border of the Ranchi District and Gumla District. Gumla District Bharno is west towards this place . Also it is in the Border of other district Khunti . There are 11 Panchayats in Lapung.
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("LAPUNG.xlsx")
 pnchyt=c((block[3]))
@@ -792,7 +821,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Lapung Block (2015-19)', 
+  main ='Distribution of funds of Lapung Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -804,10 +833,11 @@ box()
 
 ```
 
+The Lapung block has received Rs. 8.25 Crore for four years.  They are remaining with Rs. 1.58 crore i.e. approximately 20% of the received amount. Compare to all the panchayats, Kakaria has not utilized 50% of the fund received. 
 
-### Yearwise Plots
+### Yearwise exoenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -906,10 +936,11 @@ box()
 
 \newpage
 
-##Data Analysis of Itki Block
+##Fund Status of Itki Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+Itki's population is 50058. Out of this, 25234 are males whereas the females count 24824 here. This block has 7119 children in the age group of 0-6 years. Among them 3605 are boys and 3514 are girls. The block has 30 villages and there are total 9115 families in this Block. Literacy rate in Itki block is 63%. 31593 out of total 50058 populations is educated here. There are nine panchayats in Itki.
 
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("ITKI.xlsx")
 pnchyt=c((block[3]))
@@ -924,7 +955,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Itki Block (2015-19)', 
+  main ='Distribution of funds of Itki Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -936,10 +967,11 @@ box()
 
 ```
 
+Compare to all other block Itki block has received minimum amount i.e.  Rs. 5.86 Crore. But they have utilized this amount efficiently. On an average, each panchayat has received Rs. 0.65 Crore for four years. Out of nine four panchayats have utilized 100% funds received. 
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1038,10 +1070,11 @@ box()
 
 \newpage
 
-##Data Analysis of Nagri Block
+##Fund Status of Nagri Block
 
+Nagri is a community development block of Ranchi district. It consists in 44 villages and one town (Tundiul), whose total population according to the 2011 census is 76,442. There are 13 Panchayats in Nagri block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("NAGRI.xlsx")
 pnchyt=c((block[3]))
@@ -1056,7 +1089,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Nagri Block (2015-19)', 
+  main ='Distribution of funds of Nagri Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1068,10 +1101,11 @@ box()
 
 ```
 
+The Nagri block has spent Rs. 7.45 Crore out of Rs. 9.00 Crores received for four years. Panchayat Naro has utilized minimum percentage of use of fund i.e. 72%. 
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1169,9 +1203,11 @@ box()
 
 \newpage
 
-##Data Analysis of Ratu Block
+##Fund Status of Ratu Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+The Ratu block includes 37 villages and one town with a total population of 76,565 (as of 2011). It is in the 713 m elevation(altitude).  There are 20 panchayats in Ratu block
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("RATU.xlsx")
 pnchyt=c((block[3]))
@@ -1186,7 +1222,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Ratu Block (2015-19)', 
+  main ='Distribution of funds of Ratu Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1198,10 +1234,11 @@ box()
 
 ```
 
+Ratu block has managed to utilized Rs. 11.00 Crore out of Rs .13.37 Crore. The panchayat Futkaltoli and Kamre have received maximum funds i.e. Rs. 1.00 Crore each. But Kamre panchayat could not spend more 40% in four years. If you check year wise plot for Kamre panchayat ,you will notice that they have not spent funds in FY 2018-19.
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1301,9 +1338,11 @@ box()
 
 \newpage
 
-##Data Analysis of Kanke Block
+##Fund Status of Kanke Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+The population of the block is 244,072 (as of the 2011 census),  spread across 103 villages and two towns: Kanke and Arsande. It has 32 panchayats, i.e.  maximum number of panchayats in it. 
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("KANKE.xlsx")
 pnchyt=c((block[3]))
@@ -1318,7 +1357,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Kanke Block (2015-19)', 
+  main ='Distribution of funds of Kanke Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1330,10 +1369,11 @@ box()
 
 ```
 
+The population of the block is 244,072 (as of the 2011 census),  spread across 103 villages and two towns: Kanke and Arsande. It has 32 panchayats, i.e.  maximum number of panchayats in it. 
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1432,9 +1472,11 @@ box()
 
 \newpage
 
-##Data Analysis of Ormanjhi Block
+##Fund Status of Ormanjhi Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+Ormanjhi block is one of the administrative community development block of Ranchi district. It consists in 87 villages and one town (Irba), with a total population of 94,137 (as of the 2011 census). It is 18 km from Ranchi. Presently the actual distance of Ranchi from Ormanjhi is only 10 km as the city suburbs of Ranchi have expanded towards Ormanjhi. People of Kurmi and Koiri castes form major social groups of the block. Ormanjhi consist of 18 panchayats. 
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("ORMANJHI.xlsx")
 pnchyt=c((block[3]))
@@ -1449,7 +1491,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Ormanjhi Block (2015-19)', 
+  main ='Distribution of funds of Ormanjhi Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1461,10 +1503,13 @@ box()
 
 ```
 
+This block had received Rs. 11.59 Crores. By end of FY 2018-19, they have left with Rs. 1.99 Crore unspent amount. Panchayat Baridih could spent lowest percentage of funds received i.e. 28%. Whereas this is one of the panchayat who has received more than Rs. 0.77 Crore. 
 
-### Yearwise Plots
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+### Yearwise expenditure
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1563,10 +1608,11 @@ box()
 
 \newpage
 
-##Data Analysis of Angara Block
+##Funds Status of Angara Block
 
+There are 82 villages within Angara block. There are 21 Panchayats in Anagara block. 
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("ANGARA.xlsx")
 pnchyt=c((block[3]))
@@ -1581,7 +1627,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Angara Block (2015-19)', 
+  main ='Distribution of funds of Angara Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1593,10 +1639,11 @@ box()
 
 ```
 
+Anagara block has spent Rs. 11.76 Crores by end of four years. They have left with Rs. 2. 42 Crore. On an average, all the panchayats have received Rs. 0.65 Crore for four years.
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1690,15 +1737,17 @@ box()
 
 ```
 
-
+From the plot of FY 2018-19, you can see that expenditure is more than received funds
 
 
 
 \newpage
 
-##Data Analysis of Namkum Block
+##Fund Status of Namkum Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+There are 23 panchyats and a total of 109 villages, out of which 104 are inhabited and rest 5 are not. The Pragya kendra on tatisilwai has got best pragya kendra Jharkhand award at 15 national e-governance at Orissa. The total area under Namkum Block is 415.57 km2 (160.45 sq mi) and the average elevation is 629 m (2,064 ft) above sea level. Most parts of the total area are considered rural since it is in the outskirts of the city. Situated in the eastern end of Ranchi, Namkum has a large cover of forests and areable land. But these are being depleted to give space to the expanding city.
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("NAMKUM.xlsx")
 pnchyt=c((block[3]))
@@ -1713,7 +1762,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Namkum Block (2015-19)', 
+  main ='Distribution of funds of Namkum Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1725,10 +1774,11 @@ box()
 
 ```
 
+Namkum block has received Rs. 17.96 Crores for the period 2015- 2019. This block has spent least percentage of fund received i.e. 69%. 
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1829,10 +1879,11 @@ box()
 
 \newpage
 
-##Data Analysis of Bundu Block
+##Fund Status of Bundu Block
 
+The block includes 87 villages and one town, with a total population of 82,975. undu Block Head Quarters is Bundu town. It is located 40 KM towards East from District head quarters Ranchi. 41 KM from State capital Ranchi towards west.
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("BUNDU.xlsx")
 pnchyt=c((block[3]))
@@ -1847,7 +1898,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Bundu Block (2015-19)', 
+  main ='Distribution of funds of Bundu Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1859,10 +1910,11 @@ box()
 
 ```
 
+Bundu block has received funds Rs. 7.80 Crores. By end of FY 2018-19, they have unspent amount Rs. 1.17 Crore. The Churgi panchayat has received minimum amount compare to other panchayats.
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -1961,9 +2013,11 @@ box()
 
 \newpage
 
-##Data Analysis of Rahe Block
+##Fund Status of Rahe Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+The Rahe Block has  latitude 23.2677018 and longitude 85.645034. Ranchi is the state capital for Rahe village. It is located around 33.8 kilometer away from Rahe. It has 9 panchayats.
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("RAHE.xlsx")
 pnchyt=c((block[3]))
@@ -1978,7 +2032,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Rahe Block (2015-19)', 
+  main ='Distribution of funds of Rahe Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -1990,10 +2044,13 @@ box()
 
 ```
 
+Rahe has received Rs. 6.71 Croes for four years. They have spent 88 % of amount received. Panchayat Basantpur is able to spend only 55% of amount received. 
 
-### Yearwise Plots
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+
+### Yearwise expenditure
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -2094,10 +2151,11 @@ box()
 
 \newpage
 
-##Data Analysis of Silli Block
+##Fund Status of Silli Block
 
+The Silli block had a total population of 113,798 in the 2011 census, and it includes 94 villages and the town of Muri. Silli is located in the southern part of the Chota Nagpur plateau, and about 60 kilometers from the city of Ranchi, which is the eastern section of the Deccan plateau. It has a hilly topography and its dense tropical forests a combination that produces a relatively moderate climate compared to the rest of the state. It consist of 20 panchayats. 
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("SILLI.xlsx")
 pnchyt=c((block[3]))
@@ -2112,7 +2170,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Silli Block (2015-19)', 
+  main ='Distribution of funds of Silli Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -2124,10 +2182,11 @@ box()
 
 ```
 
+The Silli block has received Rs. 13.79 Crores. They have managed to spent 92% of funds received. The average funds received is Rs. 0.70 Crore for each Panchayat. 
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -2226,9 +2285,11 @@ box()
 
 \newpage
 
-##Data Analysis of Sonahatu Block
+##Fund Status of Sonahatu Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+There are 64 villages in the block, with a total population of 77,252 according to the 2011 census. Sonahatu Block is bounded by by Bundu Block towards west , Silli Block towards North , Tamar Block towards South , Jhalda-I Block towards East .There are 14 Panchayats in Sonahatu block.
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("SONAHATU.xlsx")
 pnchyt=c((block[3]))
@@ -2243,7 +2304,7 @@ barplot(
   beside=T,
   ylim = c(0,20+max(c(receive,spent))),
   col=cols,
-  main ='Analysis of Sonhatu Block (2015-19)', 
+  main ='Distribution of funds of Sonhatu Block (2015-19)', 
   names.arg=b_p$pnchayat,
   las=2, cex.names = 0.6,# xaxt='n',
   ylab='Amount (in Lakhs)',
@@ -2255,10 +2316,11 @@ box()
 
 ```
 
+This block has received Rs. 9.77 Crores. By end of four years , expenditure is Rs. 8.89 Crores. The panchayat Jilingsereng has received only Rs. 0.27 Crore. After the expenditure ,they are left with only Rs. 8671.
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
@@ -2359,9 +2421,11 @@ box()
 
 \newpage
 
-##Data Analysis of Tamar Block
+##Fund Status of Tamar Block
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+There are 23 panchayats in Tamar block
+
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 library(readxl)
 block=read_excel("TAMAR.xlsx")
 pnchyt=c((block[3]))
@@ -2388,10 +2452,11 @@ box()
 
 ```
 
+The Tamar block has received Rs. 16.85 Crores. The expenditure for four is Rs. 14.04. The average funds received for all the panchayats is Rs. 0.73 Crore. The expenditure by Malhan (Bhuiyandih) Panchayat is only 35% of the total amount received. 
 
-### Yearwise Plots
+### Yearwise expenditure
 
-```{r echo=TRUE , message=FALSE, error=FALSE, warning=FALSE}
+```{r echo=FALSE , message=FALSE, error=FALSE, warning=FALSE}
 par(mfrow=c(1,2))
 pnchyt=c((block[3]))
 spent=as.numeric(unlist(c(block[11])))/100000
